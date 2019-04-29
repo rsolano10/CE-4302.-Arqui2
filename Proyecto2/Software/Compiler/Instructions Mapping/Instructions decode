@@ -1,0 +1,9 @@
+--> Conditionals:
+    --> 0000 : Always
+
+--> Operation codes: 
+    --> 0000 : xor between registers
+
+--> Diagramas
+    --> Aritmeticas entre registros:
+        |Cond|Cond|Cond|Cond|Op|Op|Op|Op|0|0|0|0|0|0|0|0|0|0|0|0|Rs|Rs|Rs|Rs|Rs2|Rs2|Rs2|Rs2|Rd|Rd|Rd|Rd|
