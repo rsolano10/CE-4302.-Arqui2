@@ -5,24 +5,27 @@
 using namespace std;
 class instMemory
 {
-  private:
-    string InstMem[INSTMEMSIZE];
-    int headInstMem;
+private:
+  string InstMem[INSTMEMSIZE];
+  int headInstMem;
 
-  public:
-    instMemory()
-    {
-        headInstMem = 0;
-    }
+public:
+  string instruction;
 
-    void writeInstMem(std::string data)
-    {
-        InstMem[headInstMem] = data;
-        headInstMem++;
-    }
+  instMemory()
+  {
+    headInstMem = 0;
+  }
 
-    string readInstMem(int pos)
-    {
-        return *(InstMem + pos);
-    }
+  void writeInstMem(std::string data)
+  {
+    InstMem[headInstMem] = data;
+    headInstMem++;
+  }
+
+  string readInstMem(int pos)
+  {
+    instruction = *(InstMem + pos);
+    return *(InstMem + pos);
+  }
 };

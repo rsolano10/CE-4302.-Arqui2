@@ -10,7 +10,7 @@ class PC
   public:
     PC()
     {
-        PCReg = 0;
+        PCReg = -1;
     }
 
     void setPC(int pos)

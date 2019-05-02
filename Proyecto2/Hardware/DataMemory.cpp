@@ -8,21 +8,29 @@ class dataMemory
   private:
     int dataMem[DATAMEMSIZE];
     int headDataMem;
+    int *ALUinput;
+    int *dirInput;
   
   public:
-    
-    dataMemory(){
-        headDataMem = 0;
+    int memResult;
+    dataMemory(int *ALUResult, int *DataPath){
+      headDataMem = 0;
+      ALUinput = ALUResult;
+      dirInput = DataPath;
     }
 
     void writeDataMem(int data)
     {
-        dataMem[headDataMem] = (int)data;
-        headDataMem++;
+        dataMem[*dirInput] = (int) data;
     }
 
-    int readDataMem(int pos)
+    int readDataMem()
     {
-        return *(dataMem + pos);
+        return *(dataMem + *dirInput);
+    }
+
+    void uploadImage(int data){
+      dataMem[headDataMem] = (int) data;
+      headDataMem++;
     }
 };

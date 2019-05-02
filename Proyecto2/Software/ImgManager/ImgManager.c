@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../../Hardware/DataMemory.c"
 
 #define TRUE 1
 #define FALSE 0
@@ -166,13 +165,13 @@ void printMatrix(unsigned char **image)
     }
 }
 
-void StoreImage(unsigned char **image)
+/*void StoreImage(unsigned char **image)
 {
     for (int i = 0; i < totalPixels; i++)
     {
         writeDataMem((int)(*image)[i]);
     }
-}
+}*/
 
 //Funcion principal
 int main(int argc, char **argv)
