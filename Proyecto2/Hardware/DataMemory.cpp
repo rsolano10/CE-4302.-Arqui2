@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 #define DATAMEMSIZE 5000000
 
 using namespace std;
@@ -6,31 +7,43 @@ using namespace std;
 class dataMemory
 {
   private:
-    int dataMem[DATAMEMSIZE];
+    string dataMem[DATAMEMSIZE];
     int headDataMem;
-    int *ALUinput;
-    int *dirInput;
+    string *ALUinput;
+    int dirInput;
+    int *flag;
   
   public:
-    int memResult;
-    dataMemory(int *ALUResult, int *DataPath){
+    string memResult;
+    dataMemory(string *ALUResult, int *memWriteM){
       headDataMem = 0;
       ALUinput = ALUResult;
-      dirInput = DataPath;
+      dirInput = 0;
+      flag = memWriteM;
     }
 
-    void writeDataMem(int data)
+    void writeDataMem(string data)
     {
-        dataMem[*dirInput] = (int) data;
+        dataMem[dirInput] = (string) data;
     }
 
-    int readDataMem()
+    string readDataMem()
     {
-        return *(dataMem + *dirInput);
+        return *(dataMem + dirInput);
     }
 
     void uploadImage(int data){
       dataMem[headDataMem] = (int) data;
       headDataMem++;
+    }
+
+    void operate(){
+      if(*flag == 1){
+        memResult = *ALUinput;
+        writeDataMem(*ALUinput);
+      }
+      else{
+        memResult = readDataMem();
+      }
     }
 };

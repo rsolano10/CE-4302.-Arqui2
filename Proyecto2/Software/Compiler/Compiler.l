@@ -17,13 +17,12 @@
 %option yylineno 
 
 comment ;.+ 
-tag    [a-zA-Z_][a-zA-Z0-9_]*
 imme   \#-?(0x)?[a-fA-F0-9_]+
 numero [a-fA-F0-9_]+ 
 
 %%
   /*_____Rules section_____*/
-  /*ARM defined Operation keywords*/
+  /*defined Operation keywords*/
 (a|A)(d|D)(d|D)          {yylval.id=strdup(yytext); return addition;} //Add = addition
 (s|S)(u|U)(b|B)          {yylval.id=strdup(yytext); return subtra;} //sub = substraction
 (m|M)(u|U)(l|L)          {yylval.id=strdup(yytext); return multiple;} //mul = multiplication  
@@ -31,12 +30,13 @@ numero [a-fA-F0-9_]+
 (s|S)(t|T)(r|R)          {yylval.id=strdup(yytext); return store;}  //str = store in memory
 (c|C)(m|M)(p|P)          {yylval.id=strdup(yytext); return comp;} //cmp = compare
 (m|M)(o|O)(v|V)          {yylval.id=strdup(yytext); return mv;} //mov = move data to register
-(x|X)(o|O)(r|R)          {yylval.id=strdup(yytext); return xorop;} //mov = move data to register
-
-  /*Types*/
-DCB                     {yylval.id=strdup(yytext); return dcb;} //allocate bytes
-DCW                     {yylval.id=strdup(yytext); return dcw;} //allocate half-words
-DCD                     {yylval.id=strdup(yytext); return dcd;} //allocate words
+(x|X)(o|O)(r|R)          {yylval.id=strdup(yytext); return xorop;} //xor = xor operation between registers
+(c|C)(s|S)(l|L)          {yylval.id=strdup(yytext); return circularleft;} //circular shift left
+(c|C)(s|S)(r|R)          {yylval.id=strdup(yytext); return circularright;} //circular shift right
+(l|L)(s|S)(l|L)          {yylval.id=strdup(yytext); return linealleft;} //lineal shift left
+(l|L)(s|S)(r|R)          {yylval.id=strdup(yytext); return linealright;} //lineal shift right
+(b|B)(r|R)(t|T)          {yylval.id=strdup(yytext); return brepeat;} //begin repeat
+(e|E)(r|R)(t|T)          {yylval.id=strdup(yytext); return erepeat;} //end repeat
 
   /*Registers*/
 (r|R)[0-9][0-5]?         {yylval.id=strdup(yytext); return reg;} //registers
@@ -44,9 +44,6 @@ DCD                     {yylval.id=strdup(yytext); return dcd;} //allocate words
   /*Immediate*/
 {imme}                  {yylval.id=strdup(yytext); return immediate;}
 
-  /*Tags*/
-{tag}                    {yylval.id=strdup(yytext); return label;}
-  
   /*Comments*/
 {comment}                {yylval.id=strdup(yytext); return commentary;}
   

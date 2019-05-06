@@ -6,4 +6,4 @@
 
 --> Diagramas
     --> Aritmeticas entre registros:
-        |Cond|Cond|Cond|Cond|Op|Op|Op|Op|0|0|0|0|0|0|0|0|0|0|0|0|Rs|Rs|Rs|Rs|Rs2|Rs2|Rs2|Rs2|Rd|Rd|Rd|Rd|
+        |Cond|Cond|Cond|Cond|Op|Op|Op|Op|Reg or Imm|0|0|0|0|0|0|0|0|0|0|0|Rs|Rs|Rs|Rs|Rs2|Rs2|Rs2|Rs2|Rd|Rd|Rd|Rd|

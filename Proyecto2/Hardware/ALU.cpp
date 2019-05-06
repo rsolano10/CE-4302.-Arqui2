@@ -9,15 +9,6 @@ class ALU
     int *op2;
     int *flag;
 
-  public:
-    int Result;
-    ALU(int *rd1, int *rd2,int *opFlag)
-    {
-        op1 = rd1;
-        op2 = rd2;
-        flag = opFlag;
-    }
-
     int sum()
     {
         Result = ((*op1) + (*op2));
@@ -36,5 +27,20 @@ class ALU
     int xori()
     {
         Result = ((*op1) ^ (*op2));
+    }
+
+  public:
+    int Result;
+    ALU(int *rd1, int *rd2,int *opFlag)
+    {
+        op1 = rd1;
+        op2 = rd2;
+        flag = opFlag;
+    }
+
+    void operate(){
+        if(*flag == 4){
+            xori(); 
+        }
     }
 };

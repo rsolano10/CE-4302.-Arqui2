@@ -1,0 +1,61 @@
+****************************************
+---------------Fetch--------------------
+--> PC: 0
+--> Instruction: 00000000000000000000000100100011
+--> OP Code: 0000
+--> Ra1 fetch register value: 0001
+--> Ra2 fetch register value: 0010
+--> Rd fetch register value: 0011
+---------------Decode--------------------
+--> ALU flag control unit: 4
+--> Reg mem. flag control unit: 0
+--> Data mem. flag control unit: 0
+--> Reg mem Rd1: 0000000000000000000000000000000000000000000000000000000000000001
+--> Reg mem Rd2: 0000000000000000000000000000000000000000000000000000000000000000
+--> exec reg Rd1E: 0000000000000000000000000000000000000000000000000000000000000001
+--> exec reg Rd2E: 0000000000000000000000000000000000000000000000000000000000000000
+--> exec reg ALUControlE: 4
+--> exec reg RegWriteE: 0
+--> exec reg MemWriteE: 0
+--> exec reg memToReg: 0
+---------------Execute--------------------
+--> balancer Rd1E8: 1
+--> balancer Rd2E8: 0
+--> balancer Rd1E7: 0
+--> balancer Rd2E7: 0
+--> balancer Rd1E6: 0
+--> balancer Rd2E6: 0
+--> balancer Rd1E5: 0
+--> balancer Rd2E5: 0
+--> balancer Rd1E4: 0
+--> balancer Rd2E4: 0
+--> balancer Rd1E3: 0
+--> balancer Rd2E3: 0
+--> balancer Rd1E2: 0
+--> balancer Rd2E2: 0
+--> balancer Rd1E1: 0
+--> balancer Rd2E1: 0
+--> ALU result: 1
+--> ALU1 result: 0
+--> ALU2 result: 0
+--> ALU3 result: 0
+--> ALU4 result: 0
+--> ALU5 result: 0
+--> ALU6 result: 0
+--> AL7 result: 0
+--> integrator result: 0000000000000000000000000000000000000000000000000000000000000001
+--> mem reg ALUResultM: 0000000000000000000000000000000000000000000000000000000000000001
+--> mem reg RegWriteM: 1
+--> mem reg MemWriteEM: 0
+--> exec reg memToReg: 0
+---------------Memory--------------------
+--> Write-back reg ALUResultM: 0000000000000000000000000000000000000000000000000000000000000001
+--> Write-back reg MemWriteW: 0
+--> Write-back reg RegWriteW: 1
+--> exec reg memToReg: 0
+--> Write-back reg RegWrite2: 1
+--> Write-back data to write: 0000000000000000000000000000000000000000000000000000000000000001
+---------------Write Back--------------------
+--> Register to write: 3
+--> Write-back reg Read: 0000000000000000000000000000000000000000000000000000000000000001
+****************************************

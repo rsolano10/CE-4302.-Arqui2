@@ -53,14 +53,16 @@ extern int yydebug;
     store = 263,
     mv = 264,
     xorop = 265,
-    dcb = 266,
-    dcw = 267,
-    dcd = 268,
-    reg = 269,
-    immediate = 270,
-    label = 271,
-    commentary = 272,
-    number = 273
+    circularleft = 266,
+    circularright = 267,
+    linealleft = 268,
+    linealright = 269,
+    brepeat = 270,
+    erepeat = 271,
+    reg = 272,
+    immediate = 273,
+    commentary = 274,
+    number = 275
   };
 #endif
 /* Tokens.  */
@@ -72,26 +74,28 @@ extern int yydebug;
 #define store 263
 #define mv 264
 #define xorop 265
-#define dcb 266
-#define dcw 267
-#define dcd 268
-#define reg 269
-#define immediate 270
-#define label 271
-#define commentary 272
-#define number 273
+#define circularleft 266
+#define circularright 267
+#define linealleft 268
+#define linealright 269
+#define brepeat 270
+#define erepeat 271
+#define reg 272
+#define immediate 273
+#define commentary 274
+#define number 275
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 53 "Compiler.y" /* yacc.c:1909  */
+#line 46 "Compiler.y" /* yacc.c:1909  */
 
   char* id;
   int num;
 
-#line 95 "y.tab.h" /* yacc.c:1909  */
+#line 99 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

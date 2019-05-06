@@ -77,14 +77,12 @@
     #include <algorithm>
     #include <cstdlib>
     #include <fstream>
+    #include <list>
 
     
 
     //C++ definitions
-    std::map<std::string,int> labels; //labels and values
-    std::map<std::string,int> futureLabels; //if found a label before declaration
     std::fstream fs; //stream instruction file
-    std::fstream fs2; // stream data file
     std::string final_message="Compiler success";
     int memCount=0; // memory instruction count initialized
     std::string line;
@@ -95,26 +93,21 @@
     /*Define different ARM instructions structures*/
     void encondig_instruccion(std::string op,std::string rs,std::string rs2,std::string rd); // op rs,rs2,rd
     void encondig_instruccion1(std::string op,std::string rs,std::string rd,std::string immen); //op rs,rd,immen
-    void encondig_instruccion2(std::string op,std::string rs,std::string rd); // op ,rs,rd
+    void encondig_instruccion2(std::string op,std::string rs,std::string rd); // op rs,rd
     void encondig_instruccion3(std::string op,std::string rs,std::string imme); //op rs,immen
-    void encondig_instruccion4(std::string op,std::string rs,std::string tag); //op rs,tag
-    void encondig_instruccion6(std::string op,std::string rd,std::string rs,std::string rs2,int type); //op rd,rs,rs2,type
-    void encondig_instruccion7(std::string op,std::string rd,std::string rs,std::string rs2); //op rd,rs,rs2
+    void encondig_instruccion4(std::string op,std::string rd,std::string rs,std::string rs2,int type); //op rd,rs,rs2,type
+    void encondig_instruccion5(std::string op,std::string immen); //op rs,immen
     
     /*Other definitions*/
     std::string regtobin(std::string r); // parse register to binary data
-    int indexOf(std::string tag); //get the index of tag
     std::string immtobin(std::string in,int type,std::string rs); // parse immediate to binary
-    void procces_label(std::string tag,std::string g,int type);
-    void variablestobin(int val); // parse variables to binary
-    std::string current_type="DCD"; //define by default word aligment
-    int data_memory=0x10000000; //memory reference start for data
     int text_memory=0x00000000; //memory reference start for text
+    bool repeat_flag=false; //flag to know if repeat instruction
+    std::list <std::string> instlist; //list of instructions to repeat
     void yyerror(std::string S); // define error function
-    void printt(std::string s); //Define print function
 
 
-#line 118 "y.tab.c" /* yacc.c:339  */
+#line 111 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -157,14 +150,16 @@ extern int yydebug;
     store = 263,
     mv = 264,
     xorop = 265,
-    dcb = 266,
-    dcw = 267,
-    dcd = 268,
-    reg = 269,
-    immediate = 270,
-    label = 271,
-    commentary = 272,
-    number = 273
+    circularleft = 266,
+    circularright = 267,
+    linealleft = 268,
+    linealright = 269,
+    brepeat = 270,
+    erepeat = 271,
+    reg = 272,
+    immediate = 273,
+    commentary = 274,
+    number = 275
   };
 #endif
 /* Tokens.  */
@@ -176,26 +171,28 @@ extern int yydebug;
 #define store 263
 #define mv 264
 #define xorop 265
-#define dcb 266
-#define dcw 267
-#define dcd 268
-#define reg 269
-#define immediate 270
-#define label 271
-#define commentary 272
-#define number 273
+#define circularleft 266
+#define circularright 267
+#define linealleft 268
+#define linealright 269
+#define brepeat 270
+#define erepeat 271
+#define reg 272
+#define immediate 273
+#define commentary 274
+#define number 275
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 
 union YYSTYPE
 {
-#line 53 "Compiler.y" /* yacc.c:355  */
+#line 46 "Compiler.y" /* yacc.c:355  */
 
   char* id;
   int num;
 
-#line 199 "y.tab.c" /* yacc.c:355  */
+#line 196 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -212,7 +209,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 216 "y.tab.c" /* yacc.c:358  */
+#line 213 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -454,21 +451,21 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  2
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   61
+#define YYLAST   33
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  25
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  7
+#define YYNNTS  4
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  35
+#define YYNRULES  27
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  56
+#define YYNSTATES  38
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   273
+#define YYMAXUTOK   275
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -478,15 +475,15 @@ union yyalloc
 static const yytype_uint8 yytranslate[] =
 {
        0,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      19,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,    24,     2,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,    20,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,    21,     2,     2,     2,     2,     2,     2,     2,     2,
+      21,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-       2,    22,     2,    23,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,    22,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
+       2,    23,     2,    24,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -504,17 +501,16 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
-      15,    16,    17,    18
+      15,    16,    17,    18,    19,    20
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    71,    71,    72,    73,    74,    75,    76,    77,    78,
-      81,    82,    83,    84,    85,    86,    87,    88,    89,    90,
-      91,    92,    95,    97,    98,   100,   101,   102,   105,   106,
-     107,   108,   109,   110,   111,   112
+       0,    62,    62,    63,    64,    67,    68,    69,    70,    71,
+      72,    73,    74,    75,    79,    80,    81,    82,    83,    84,
+      85,    86,    87,    88,    89,    90,    91,    92
 };
 #endif
 
@@ -524,10 +520,10 @@ static const yytype_uint8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "addition", "subtra", "multiple", "comp",
-  "load", "store", "mv", "xorop", "dcb", "dcw", "dcd", "reg", "immediate",
-  "label", "commentary", "number", "'\\n'", "','", "'='", "'['", "']'",
-  "'!'", "$accept", "line", "instruccion", "variable", "array", "val_type",
-  "operation", YY_NULLPTR
+  "load", "store", "mv", "xorop", "circularleft", "circularright",
+  "linealleft", "linealright", "brepeat", "erepeat", "reg", "immediate",
+  "commentary", "number", "'\\n'", "','", "'['", "']'", "$accept", "line",
+  "instruccion", "operation", YY_NULLPTR
 };
 #endif
 
@@ -537,15 +533,15 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266,   267,   268,   269,   270,   271,   272,   273,    10,
-      44,    61,    91,    93,    33
+     265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
+     275,    10,    44,    91,    93
 };
 # endif
 
-#define YYPACT_NINF -19
+#define YYPACT_NINF -20
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-19)))
+  (!!((Yystate) == (-20)))
 
 #define YYTABLE_NINF -1
 
@@ -556,12 +552,10 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -19,    19,   -19,   -19,   -19,   -19,   -19,   -19,   -19,   -19,
-     -19,   -19,    -1,   -18,    -4,    15,     7,   -19,   -19,   -19,
-      14,   -19,    22,    29,   -19,   -19,   -19,    21,   -19,    26,
-     -19,   -19,   -19,    31,   -19,    16,    32,    33,   -19,    36,
-      34,   -19,    28,   -19,    -6,   -19,   -19,    30,    35,    37,
-      38,    39,   -19,    25,   -19,   -19
+     -20,     0,   -20,   -20,   -20,   -20,   -20,   -20,   -20,   -20,
+     -20,   -20,   -20,   -20,   -20,   -20,   -20,   -20,   -19,     4,
+      13,   -20,   -20,   -20,    -5,   -20,     3,    -4,   -20,     7,
+      15,     5,   -20,   -20,    10,   -20,    -2,   -20
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -569,24 +563,22 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       9,     0,     1,    21,    28,    29,    30,    31,    33,    32,
-      34,    35,     0,     0,     0,     0,     0,    25,    26,    27,
-       0,     4,     0,     0,     6,    20,     3,     0,     2,     0,
-       7,     5,    23,    22,     8,     0,     0,    10,    11,     0,
-       0,    24,     0,    12,     0,    19,    13,     0,    14,     0,
-       0,     0,    15,    16,    17,    18
+       4,     0,     1,    13,    14,    15,    16,    17,    19,    18,
+      20,    21,    22,    23,    24,    25,    26,    27,     0,     0,
+       0,     3,    12,     2,     0,    11,     0,     5,     6,     0,
+       0,     0,    10,     7,     0,     8,     0,     9
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -19,   -19,    44,   -19,   -19,   -19,   -19
+     -20,   -20,   -20,   -20
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     1,    14,    15,    33,    23,    16
+      -1,     1,    19,    20
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -594,24 +586,18 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-       3,    24,     4,     5,     6,     7,     8,     9,    10,    11,
-      17,    18,    19,    25,    47,    26,    20,    48,    21,     2,
-       3,    29,     4,     5,     6,     7,     8,     9,    10,    11,
-      37,    38,    27,    30,    28,    12,    13,    39,    40,    25,
-      34,    31,    45,    46,    49,    50,    35,    32,    44,    55,
-      41,    36,    43,    42,    54,    51,    22,     0,     0,     0,
-      52,    53
+       2,     3,    21,     4,     5,     6,     7,     8,     9,    10,
+      11,    12,    13,    14,    15,    16,    17,    26,    30,    18,
+      27,    28,    37,    22,    31,    23,    29,    34,    36,    35,
+      24,    25,    32,    33
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_uint8 yycheck[] =
 {
-       1,    19,     3,     4,     5,     6,     7,     8,     9,    10,
-      11,    12,    13,    17,    20,    19,    17,    23,    19,     0,
-       1,    14,     3,     4,     5,     6,     7,     8,     9,    10,
-      14,    15,    17,    19,    19,    16,    17,    21,    22,    17,
-      19,    19,    14,    15,    14,    15,    20,    18,    14,    24,
-      18,    20,    16,    20,    15,    20,    12,    -1,    -1,    -1,
-      23,    23
+       0,     1,    21,     3,     4,     5,     6,     7,     8,     9,
+      10,    11,    12,    13,    14,    15,    16,    22,    22,    19,
+      17,    18,    24,    19,    17,    21,    23,    22,    18,    24,
+      17,    18,    17,    18
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -619,29 +605,25 @@ static const yytype_int8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,    26,     0,     1,     3,     4,     5,     6,     7,     8,
-       9,    10,    16,    17,    27,    28,    31,    11,    12,    13,
-      17,    19,    27,    30,    19,    17,    19,    17,    19,    14,
-      19,    19,    18,    29,    19,    20,    20,    14,    15,    21,
-      22,    18,    20,    16,    14,    14,    15,    20,    23,    14,
-      15,    20,    23,    23,    15,    24
+       9,    10,    11,    12,    13,    14,    15,    16,    19,    27,
+      28,    21,    19,    21,    17,    18,    22,    17,    18,    23,
+      22,    17,    17,    18,    22,    24,    18,    24
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    25,    26,    26,    26,    26,    26,    26,    26,    26,
-      27,    27,    27,    27,    27,    27,    27,    27,    27,    27,
-      27,    27,    28,    29,    29,    30,    30,    30,    31,    31,
-      31,    31,    31,    31,    31,    31
+       0,    25,    26,    26,    26,    27,    27,    27,    27,    27,
+      27,    27,    27,    27,    28,    28,    28,    28,    28,    28,
+      28,    28,    28,    28,    28,    28,    28,    28
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     3,     3,     3,     4,     3,     4,     4,     0,
-       4,     4,     5,     6,     6,     8,     8,     8,     9,     6,
-       2,     1,     3,     1,     3,     1,     1,     1,     1,     1,
-       1,     1,     1,     1,     1,     1
+       0,     2,     3,     3,     0,     4,     4,     6,     6,     8,
+       6,     2,     2,     1,     1,     1,     1,     1,     1,     1,
+       1,     1,     1,     1,     1,     1,     1,     1
 };
 
 
@@ -1317,182 +1299,146 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 4:
-#line 73 "Compiler.y" /* yacc.c:1646  */
-    {procces_label((yyvsp[-1].id),"",1);}
-#line 1324 "y.tab.c" /* yacc.c:1646  */
+        case 5:
+#line 67 "Compiler.y" /* yacc.c:1646  */
+    {encondig_instruccion2((yyvsp[-3].id),(yyvsp[-2].id),(yyvsp[0].id));}
+#line 1306 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 5:
-#line 74 "Compiler.y" /* yacc.c:1646  */
-    {procces_label((yyvsp[-2].id),"",1);}
-#line 1330 "y.tab.c" /* yacc.c:1646  */
+  case 6:
+#line 68 "Compiler.y" /* yacc.c:1646  */
+    {encondig_instruccion3((yyvsp[-3].id),(yyvsp[-2].id),(yyvsp[0].id));}
+#line 1312 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 7:
-#line 76 "Compiler.y" /* yacc.c:1646  */
-    {procces_label((yyvsp[-2].id),"",1);}
-#line 1336 "y.tab.c" /* yacc.c:1646  */
+#line 69 "Compiler.y" /* yacc.c:1646  */
+    {encondig_instruccion1((yyvsp[-5].id),(yyvsp[-2].id),(yyvsp[-4].id),(yyvsp[0].id));}
+#line 1318 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 8:
+#line 70 "Compiler.y" /* yacc.c:1646  */
+    {encondig_instruccion4((yyvsp[-5].id),(yyvsp[-4].id),(yyvsp[-1].id),"",1);}
+#line 1324 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 9:
+#line 71 "Compiler.y" /* yacc.c:1646  */
+    {encondig_instruccion4((yyvsp[-7].id),(yyvsp[-6].id),(yyvsp[-3].id),(yyvsp[-1].id),3);}
+#line 1330 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 10:
-#line 81 "Compiler.y" /* yacc.c:1646  */
-    {encondig_instruccion2((yyvsp[-3].id),(yyvsp[0].id),(yyvsp[-2].id));}
-#line 1342 "y.tab.c" /* yacc.c:1646  */
+#line 72 "Compiler.y" /* yacc.c:1646  */
+    {encondig_instruccion((yyvsp[-5].id),(yyvsp[-4].id),(yyvsp[-2].id),(yyvsp[0].id));}
+#line 1336 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
-#line 82 "Compiler.y" /* yacc.c:1646  */
-    {encondig_instruccion3((yyvsp[-3].id),(yyvsp[-2].id),(yyvsp[0].id));}
-#line 1348 "y.tab.c" /* yacc.c:1646  */
+#line 73 "Compiler.y" /* yacc.c:1646  */
+    {encondig_instruccion5((yyvsp[-1].id),(yyvsp[0].id));}
+#line 1342 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 83 "Compiler.y" /* yacc.c:1646  */
-    {encondig_instruccion4((yyvsp[-4].id),(yyvsp[-3].id),(yyvsp[0].id));}
-#line 1354 "y.tab.c" /* yacc.c:1646  */
+#line 74 "Compiler.y" /* yacc.c:1646  */
+    {;}
+#line 1348 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 84 "Compiler.y" /* yacc.c:1646  */
-    {encondig_instruccion1((yyvsp[-5].id),(yyvsp[-2].id),(yyvsp[-4].id),(yyvsp[0].id));}
-#line 1360 "y.tab.c" /* yacc.c:1646  */
+#line 75 "Compiler.y" /* yacc.c:1646  */
+    {yyerror("instruccion not supported");}
+#line 1354 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 85 "Compiler.y" /* yacc.c:1646  */
-    {encondig_instruccion6((yyvsp[-5].id),(yyvsp[-4].id),(yyvsp[-1].id),"",1);}
-#line 1366 "y.tab.c" /* yacc.c:1646  */
+#line 79 "Compiler.y" /* yacc.c:1646  */
+    {;}
+#line 1360 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 86 "Compiler.y" /* yacc.c:1646  */
-    {encondig_instruccion6((yyvsp[-7].id),(yyvsp[-6].id),(yyvsp[-3].id),(yyvsp[-1].id),2);}
-#line 1372 "y.tab.c" /* yacc.c:1646  */
+#line 80 "Compiler.y" /* yacc.c:1646  */
+    {;}
+#line 1366 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 16:
-#line 87 "Compiler.y" /* yacc.c:1646  */
-    {encondig_instruccion6((yyvsp[-7].id),(yyvsp[-6].id),(yyvsp[-3].id),(yyvsp[-1].id),3);}
-#line 1378 "y.tab.c" /* yacc.c:1646  */
+#line 81 "Compiler.y" /* yacc.c:1646  */
+    {;}
+#line 1372 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 17:
-#line 88 "Compiler.y" /* yacc.c:1646  */
-    {encondig_instruccion7((yyvsp[-7].id),(yyvsp[-6].id),(yyvsp[-3].id),(yyvsp[0].id));}
-#line 1384 "y.tab.c" /* yacc.c:1646  */
+#line 82 "Compiler.y" /* yacc.c:1646  */
+    {;}
+#line 1378 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 89 "Compiler.y" /* yacc.c:1646  */
-    {encondig_instruccion6((yyvsp[-8].id),(yyvsp[-7].id),(yyvsp[-4].id),(yyvsp[-2].id),4);}
-#line 1390 "y.tab.c" /* yacc.c:1646  */
+#line 83 "Compiler.y" /* yacc.c:1646  */
+    {;}
+#line 1384 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 90 "Compiler.y" /* yacc.c:1646  */
-    {encondig_instruccion((yyvsp[-5].id),(yyvsp[-4].id),(yyvsp[-2].id),(yyvsp[0].id));}
-#line 1396 "y.tab.c" /* yacc.c:1646  */
+#line 84 "Compiler.y" /* yacc.c:1646  */
+    {;}
+#line 1390 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 91 "Compiler.y" /* yacc.c:1646  */
+#line 85 "Compiler.y" /* yacc.c:1646  */
+    {;}
+#line 1396 "y.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 21:
+#line 86 "Compiler.y" /* yacc.c:1646  */
     {;}
 #line 1402 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 21:
-#line 92 "Compiler.y" /* yacc.c:1646  */
-    {yyerror("instruccion not supported");}
+  case 22:
+#line 87 "Compiler.y" /* yacc.c:1646  */
+    {;}
 #line 1408 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 22:
-#line 95 "Compiler.y" /* yacc.c:1646  */
-    {procces_label((yyvsp[-2].id),(yyvsp[-1].id),2);}
+  case 23:
+#line 88 "Compiler.y" /* yacc.c:1646  */
+    {;}
 #line 1414 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 23:
-#line 97 "Compiler.y" /* yacc.c:1646  */
-    {variablestobin((yyvsp[0].num));}
+  case 24:
+#line 89 "Compiler.y" /* yacc.c:1646  */
+    {;}
 #line 1420 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 24:
-#line 98 "Compiler.y" /* yacc.c:1646  */
-    {variablestobin((yyvsp[0].num));}
+  case 25:
+#line 90 "Compiler.y" /* yacc.c:1646  */
+    {;}
 #line 1426 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 25:
-#line 100 "Compiler.y" /* yacc.c:1646  */
-    {(yyval.id)=(yyvsp[0].id);}
+  case 26:
+#line 91 "Compiler.y" /* yacc.c:1646  */
+    {;}
 #line 1432 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 26:
-#line 101 "Compiler.y" /* yacc.c:1646  */
-    {(yyval.id)=(yyvsp[0].id);}
+  case 27:
+#line 92 "Compiler.y" /* yacc.c:1646  */
+    {;}
 #line 1438 "y.tab.c" /* yacc.c:1646  */
     break;
 
-  case 27:
-#line 102 "Compiler.y" /* yacc.c:1646  */
-    {(yyval.id)=(yyvsp[0].id);}
-#line 1444 "y.tab.c" /* yacc.c:1646  */
-    break;
 
-  case 28:
-#line 105 "Compiler.y" /* yacc.c:1646  */
-    {;}
-#line 1450 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 29:
-#line 106 "Compiler.y" /* yacc.c:1646  */
-    {;}
-#line 1456 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 30:
-#line 107 "Compiler.y" /* yacc.c:1646  */
-    {;}
-#line 1462 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 31:
-#line 108 "Compiler.y" /* yacc.c:1646  */
-    {;}
-#line 1468 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 32:
-#line 109 "Compiler.y" /* yacc.c:1646  */
-    {;}
-#line 1474 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 33:
-#line 110 "Compiler.y" /* yacc.c:1646  */
-    {;}
-#line 1480 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 34:
-#line 111 "Compiler.y" /* yacc.c:1646  */
-    {;}
-#line 1486 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 35:
-#line 112 "Compiler.y" /* yacc.c:1646  */
-    {;}
-#line 1492 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-
-#line 1496 "y.tab.c" /* yacc.c:1646  */
+#line 1442 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1720,7 +1666,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 115 "Compiler.y" /* yacc.c:1906  */
+#line 95 "Compiler.y" /* yacc.c:1906  */
 
 
 extern int yyparse();
@@ -1732,56 +1678,152 @@ void encondig_instruccion(std::string op,std::string rs,std::string rs2,std::str
   std::string binIns="0000"; //Condition always
   text_memory+=0x4; // incrementa contador de instrucciones en 4 debido a la alineacion
   if(op.compare("Add")==0 || op.compare("ADD")==0 || op.compare("add")==0){
-    /*binIns+="00001000"; // 00 , ImmediateOperand = 0, OP code add, COndition code = 0
-    binIns+=regtobin(rs); // agrega binario de registro operando 1
-    binIns+=regtobin(rd); // agrega binario de registro destino
-    binIns+="00000000"; // bits no utilizados
-    binIns+=regtobin(rs2); // agrega binario de registro operando 2*/
-    fs<<binIns<<'\n'; // guarda en archivo de instrucciones
-  }else if(op.compare("Sub")==0 || op.compare("sub")==0 || op.compare("SUB")==0){
-    /*binIns+="00000100"; // 00 , ImmediateOperand = 0, OP code sub, COndition code = 0
+    binIns+="0001"; // Op code for add
+    binIns+="000000000000"; // bit of reg or imm operation + empty bits if necessary
     binIns+=regtobin(rs);
-    binIns+=regtobin(rd);
-    binIns+="00000000";
     binIns+=regtobin(rs2);
-    fs<<binIns<<'\n';*/
+    binIns+=regtobin(rd);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
+    
+  }else if(op.compare("Sub")==0 || op.compare("sub")==0 || op.compare("SUB")==0){
+    binIns+="0010"; // Op code for sub
+    binIns+="000000000000"; // bit of reg or imm operation + empty bits if necessary
+    binIns+=regtobin(rs);
+    binIns+=regtobin(rs2);
+    binIns+=regtobin(rd);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
   }else if(op.compare("Mul")==0 || op.compare("MUL")==0 || op.compare("mul")==0){
-    /*binIns+="00011100"; // 000000, A = 0, Conditional Code = 0
-    binIns+=regtobin(rs); // agrega binario de registro operando 1
-    binIns+=regtobin(rd); // agrega binario de registro destino
-    binIns+="00000000"; // bits no utilizados
-    binIns+=regtobin(rs2); // agrega binario de registro operando 2
-    fs<<binIns<<'\n';*/
+    binIns+="0011"; // Op code for mul
+    binIns+="000000000000"; // bit of reg or imm operation + empty bits if necessary
+    binIns+=regtobin(rs);
+    binIns+=regtobin(rs2);
+    binIns+=regtobin(rd);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
   }
   else if(op.compare("Xor")==0 || op.compare("XOR")==0 || op.compare("xor")==0){
     binIns+="0000"; // Op code for xor
-    binIns+="000000000000"; // empty bits if necessary
+    binIns+="000000000000"; // bit of reg or imm operation + empty bits if necessary
     binIns+=regtobin(rs);
     binIns+=regtobin(rs2);
     binIns+=regtobin(rd);
-    fs<<binIns<<'\n';
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
   }
   else{
-    std::cout<< "Error at read instruccion: Format mnemonic R,R,R only support Add,Sub,Mult"<<'\n';
+    std::cout<< "Error at read instruccion: Format mnemonic R,R,R only support Add,Sub,Mult,Xor"<<'\n';
+  }
+}
+
+//intruccion  op rd,rs,#imme
+void encondig_instruccion1(std::string op,std::string rs,std::string rd,std::string immen){
+  std::string binIns="0000";
+  text_memory+=0x4;
+  if(op.compare("Add")==0 || op.compare("ADD")==0 || op.compare("add")==0){
+
+    binIns+="0001"; // Op code for add
+    binIns+="10000000"; // bit of reg or imm operation + empty bits if necessary
+    std::string r=regtobin(rd);
+    binIns+=r;
+    binIns+=regtobin(rs);
+    binIns+=immtobin(immen,1,r);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
+  }
+  else if(op.compare("Sub")==0 || op.compare("sub")==0 || op.compare("SUB")==0){
+    binIns+="0010"; // Op code for add
+    binIns+="100000000000"; // bit of reg or imm operation + empty bits if necessary
+    std::string r=regtobin(rd);
+    binIns+=r;
+    binIns+=regtobin(rs);
+    binIns+=immtobin(immen,1,r);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
+  }else if(op.compare("Mul")==0 || op.compare("MUL")==0 || op.compare("mul")==0){
+    binIns+="0011"; // Op code for mul
+    binIns+="100000000000"; // bit of reg or imm operation + empty bits if necessary
+    std::string r=regtobin(rd);
+    binIns+=r;
+    binIns+=regtobin(rs);
+    binIns+=immtobin(immen,1,r);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
+  }
+  else if(op.compare("Xor")==0 || op.compare("XOR")==0 || op.compare("xor")==0){
+    binIns+="0000"; // Op code for xor
+    binIns+="100000000000"; // bit of reg or imm operation + empty bits if necessary
+    std::string r=regtobin(rd);
+    binIns+=r;
+    binIns+=regtobin(rs);
+    binIns+=immtobin(immen,1,r);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
+  }
+  else{
+    std::cout<< "Error at read instruccion: format mnemonic R,R,Imm only support cmp,mov,up"<<'\n';
   }
 }
 
 //Instruccion op rd,rs
 void encondig_instruccion2(std::string op,std::string rs,std::string rd){
-  std::string binIns="1110";
+  std::string binIns="0000";
   text_memory+=0x4;
   if(op.compare("cmp")==0 || op.compare("CMP")==0 || op.compare("Cmp")==0){
-    binIns+="00010101"; //Alter conditional codes
-    binIns+=regtobin(rd);
-    binIns+="000000000000";
+    binIns+="0100"; // Op code for cmp
+    binIns+="0000000000000000"; // empty bits if necessary
     binIns+=regtobin(rs);
-    fs<<binIns<<'\n';
+    binIns+=regtobin(rd);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
   }else if(op.compare("mov")==0 || op.compare("MOV")==0 || op.compare("Mov")==0){
-    binIns+="000110100000";
-    binIns+=regtobin(rd);
-    binIns+="00000000";
+    binIns+="0101"; // Op code for cmp
+    binIns+="0000000000000000"; // empty bits if necessary
     binIns+=regtobin(rs);
-    fs<<binIns<<'\n';
+    binIns+=regtobin(rd);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
   }
   else{
     std::cout<< "Error at read instruccion: format mnemonic R,R only support cmp,mov"<<'\n';
@@ -1790,247 +1832,208 @@ void encondig_instruccion2(std::string op,std::string rs,std::string rd){
 
 //Instruccion op rd,#imme
 void encondig_instruccion3(std::string op,std::string rs,std::string imme){
-  std::string binIns="1110";
+  std::string binIns="0000";
   text_memory+=0x4;
   if(op.compare("cmp")==0 || op.compare("CMP")==0 || op.compare("Cmp")==0){
-    binIns+="00110101";
+    binIns+="0100";
+    binIns+="100000000000"; // empty bits if necessary
     std::string r=regtobin(rs);
     binIns+=r;
-    binIns+="0000";
     binIns+=immtobin(imme,1,r);
-    fs<<binIns<<'\n';
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
   }
   else if(op.compare("mov")==0 || op.compare("MOV")==0 || op.compare("Mov")==0){
-    binIns+="001110100000";
+    binIns+="0101";
+    binIns+="100000000000"; // empty bits if necessary
     std::string r=regtobin(rs);
     binIns+=r;
-    std::string inm=immtobin(imme,4,r);
-    binIns+=inm;
-    if(inm.compare("nop")!=0){ // identifies nop for coding over  pipeline without risks
-       fs<<binIns<<'\n'; 
+    binIns+=immtobin(imme,1,r);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
+  }
+  else if(op.compare("csl")==0 || op.compare("CSL")==0 || op.compare("Csl")==0){
+    binIns+="0110";
+    binIns+="100000000000"; // empty bits if necessary
+    std::string r=regtobin(rs);
+    binIns+=r;
+    binIns+=immtobin(imme,1,r);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
+  }
+  else if(op.compare("csr")==0 || op.compare("CSR")==0 || op.compare("Csr")==0){
+    binIns+="0111";
+    binIns+="100000000000"; // empty bits if necessary
+    std::string r=regtobin(rs);
+    binIns+=r;
+    binIns+=immtobin(imme,1,r);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
+    
+  }
+  else if(op.compare("lsl")==0 || op.compare("LSL")==0 || op.compare("Lsl")==0){
+    binIns+="1000";
+    binIns+="100000000000"; // empty bits if necessary
+    std::string r=regtobin(rs);
+    binIns+=r;
+    binIns+=immtobin(imme,1,r);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
+    
+  }
+  else if(op.compare("lsr")==0 || op.compare("LSR")==0 || op.compare("Lsr")==0){
+    binIns+="1001";
+    binIns+="100000000000"; // empty bits if necessary
+    std::string r=regtobin(rs);
+    binIns+=r;
+    binIns+=immtobin(imme,1,r);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
     }
   }
   else{
-    std::cout<< "Error at read instruccion: format mnemonic R,Imm only support cmp,mov"<<'\n';
-  }
-}
-
-//No implementadas correctamente, no realizan lo que deberian
-void encondig_instruccion4(std::string op,std::string rs,std::string tag){
-  std::string binIns="1110";
-  text_memory+=0x4;
-  if(op.compare("ldr")==0 || op.compare("Ldr")==0 || op.compare("LDR")==0){
-    binIns+="010100010000";
-    binIns+=regtobin(rs);
-    int result=labels.find(tag)->second;
-    binIns+=std::bitset<12>(result).to_string();
-    fs<<binIns<<'\n';
-  }else if(op.compare("str")==0 || op.compare("Str")==0 || op.compare("STR")==0){
-    binIns+="010100000000";
-    binIns+=regtobin(rs);
-    int result=labels.find(tag)->second;
-    binIns+=std::bitset<12>(result).to_string();
-    fs<<binIns<<'\n';
-  }else{
-    std::cout<< "Error at read instruccion: No implementado"<<'\n';
+    std::cout<< "Error at read instruccion: format mnemonic R,Imm only support cmp,mov and shifts"<<'\n';
   }
 }
 
 //intruccion op rd,[rs,rm]
 //op rd,[rs,#imme] (post index and offset)
-void encondig_instruccion6(std::string op,std::string rd,std::string rs,std::string rs2,int type){
-  std::string binIns="111001";
+void encondig_instruccion4(std::string op,std::string rd,std::string rs,std::string rs2,int type){
+  std::string binIns="0000";
   text_memory+=0x4;
   if(op.compare("ldr")==0 || op.compare("Ldr")==0 || op.compare("LDR")==0){
     if(type==1){ //op rd,[r]
-      binIns+="111001";
+      binIns+="1010";
+      binIns+="0000000000000000"; // empty bits if necessary
       binIns+=regtobin(rs);
       binIns+=regtobin(rd);
-      binIns+="000000000000";
-      fs<<binIns<<'\n';
-      /*fs<<"11100001101000000000000000000000"<<'\n'; //atasca pipe
-      fs<<"11100001101000000000000000000000"<<'\n';
-      fs<<"11100001101000000000000000000000"<<'\n';*/
-      //text_memory+=0xC;
-    }else if(type==2){ //op rd,[r, r]
-      binIns+="011001";
-      binIns+=regtobin(rs);
-      binIns+=regtobin(rd);
-      binIns+="00000000";
-      binIns+=regtobin(rs2);
-      fs<<binIns<<'\n';
-      /*fs<<"11100001101000000000000000000000"<<'\n';
-      fs<<"11100001101000000000000000000000"<<'\n';
-      fs<<"11100001101000000000000000000000"<<'\n';
-      text_memory+=0xC;*/
+      if(!repeat_flag){
+        fs<<binIns<<'\n';
+      }
+      else{
+        instlist.push_back(binIns);
+      }
     }else if(type==3){ //op rd,[r,imm]
       if(rs2.find("-")==std::string::npos){ //neg imm
-        binIns+="111001";
+        binIns+="1010";
+        binIns+="10000000"; // empty bits if necessary
         binIns+=regtobin(rs);
         binIns+=regtobin(rd);
-        binIns+=immtobin(rs2,2,"");
-        fs<<binIns<<'\n';
-        /*fs<<"11100001101000000000000000000000"<<'\n';
-        fs<<"11100001101000000000000000000000"<<'\n';
-        fs<<"11100001101000000000000000000000"<<'\n';
-        text_memory+=0xC;*/
+        binIns+=immtobin(rs2,1,"");
+        if(!repeat_flag){
+          fs<<binIns<<'\n';
+        }
+        else{
+          instlist.push_back(binIns);
+        }
       }else{ //pos imm
         rs2.erase(1,1);
-        binIns+="110001";
+        binIns+="1010";
+        binIns+="10000000"; // empty bits if necessary
         binIns+=regtobin(rs);
         binIns+=regtobin(rd);
-        binIns+=immtobin(rs2,2,"");
-        fs<<binIns<<'\n';
-        /*fs<<"11100001101000000000000000000000"<<'\n';
-        fs<<"11100001101000000000000000000000"<<'\n';
-        fs<<"11100001101000000000000000000000"<<'\n';
-        text_memory+=0xC;*/
-      }
-    }else if(type==4){ //op rd,[r,imm]!
-      if(rs2.find("-")==std::string::npos){ //neg imm
-        binIns+="111011";
-        binIns+=regtobin(rs);
-        binIns+=regtobin(rd);
-        binIns+=immtobin(rs2,2,"");
-        fs<<binIns<<'\n';
-        /*fs<<"11100001101000000000000000000000"<<'\n';
-        fs<<"11100001101000000000000000000000"<<'\n';
-        fs<<"11100001101000000000000000000000"<<'\n';
-        text_memory+=0xC;*/
-      }else{ // pos imm
-        rs2.erase(1,1);
-        binIns+="110011";
-        binIns+=regtobin(rs);
-        binIns+=regtobin(rd);
-        binIns+=immtobin(rs2,2,"");
-        fs<<binIns<<'\n';
-        /*fs<<"11100001101000000000000000000000"<<'\n';
-        fs<<"11100001101000000000000000000000"<<'\n';
-        fs<<"11100001101000000000000000000000"<<'\n';
-        text_memory+=0xC;*/
+        binIns+=immtobin(rs2,1,"");
+        if(!repeat_flag){
+          fs<<binIns<<'\n';
+        }
+        else{
+          instlist.push_back(binIns);
+        }
       }
     }
   }else if(op.compare("str")==0 || op.compare("Str")==0 || op.compare("STR")==0){
     if(type==1){ //op rd,[r]
-      binIns+="111000";
+      binIns+="1011";
+      binIns+="0000000000000000"; // empty bits if necessary
       binIns+=regtobin(rs);
       binIns+=regtobin(rd);
-      binIns+="000000000000";
-      fs<<binIns<<'\n';
-    }else if(type==2){ //op rd,[r,r]
-      binIns+="011000";
-      binIns+=regtobin(rs);
-      binIns+=regtobin(rd);
-      binIns+="00000000";
-      binIns+=regtobin(rs2);
-      fs<<binIns<<'\n';
+      if(!repeat_flag){
+        fs<<binIns<<'\n';
+      }
+      else{
+        instlist.push_back(binIns);
+      }
     }else if(type==3){ //op rd,[r,imm]
       if(rs2.find("-")==std::string::npos){
-        binIns+="111000";
+        binIns+="1011";
+        binIns+="10000000"; // empty bits if necessary
         binIns+=regtobin(rs);
         binIns+=regtobin(rd);
-        binIns+=immtobin(rs2,2,"");
-        fs<<binIns<<'\n';
+        binIns+=immtobin(rs2,1,"");
+        if(!repeat_flag){
+          fs<<binIns<<'\n';
+        }
+        else{
+          instlist.push_back(binIns);
+        }
       }else{
         rs2.erase(1,1);
-        binIns+="110000";
+        binIns+="1011";
+        binIns+="10000000"; // empty bits if necessary
         binIns+=regtobin(rs);
         binIns+=regtobin(rd);
-        binIns+=immtobin(rs2,2,"");
-        fs<<binIns<<'\n';
-      }
-    }else if(type==4){ //op rd,[r,imm]!
-      if(rs2.find("-")==std::string::npos){
-        binIns+="111010";
-        binIns+=regtobin(rs);
-        binIns+=regtobin(rd);
-        binIns+=immtobin(rs2,2,"");
-        fs<<binIns<<'\n';
-      }else{
-        rs2.erase(1,1);
-        binIns+="110010";
-        binIns+=regtobin(rs);
-        binIns+=regtobin(rd);
-        binIns+=immtobin(rs2,2,"");
-        fs<<binIns<<'\n';
+        binIns+=immtobin(rs2,1,"");
+        if(!repeat_flag){
+          fs<<binIns<<'\n';
+        }
+        else{
+          instlist.push_back(binIns);
+        }
       }
     }
   }
   else{
-    std::cout<< "Error at read instruccion: not supported instruction"<<'\n';
+    std::cout<< "Error at store/read instruccion: not supported instruction"<<'\n';
   }
 }
 
-//Instruccion op rd,[rs],#imme (post index)
-void encondig_instruccion7(std::string op,std::string rd,std::string rs,std::string rs2){
-  std::string binIns="111001";
+//Instruccion op #imme
+void encondig_instruccion5(std::string op,std::string imme){
+  std::string binIns="0000";
   text_memory+=0x4;
-  if(op.compare("ldr")==0 || op.compare("Ldr")==0 || op.compare("LDR")==0){
-    if(rs2.find("-")==std::string::npos){ //neg imm
-      binIns+="101001";
-      binIns+=regtobin(rs);
-      binIns+=regtobin(rd);
-      binIns+=immtobin(rs2,2,"");
-      fs<<binIns<<'\n';
-      /*fs<<"11100001101000000000000000000000"<<'\n';
-      fs<<"11100001101000000000000000000000"<<'\n';
-      fs<<"11100001101000000000000000000000"<<'\n';
-      text_memory+=0xC;*/
-    }else{ //pos imm
-      rs2.erase(1,1);
-      binIns+="100001";
-      binIns+=regtobin(rs);
-      binIns+=regtobin(rd);
-      binIns+=immtobin(rs2,2,"");
-      fs<<binIns<<'\n';
-      /*fs<<"11100001101000000000000000000000"<<'\n';
-      fs<<"11100001101000000000000000000000"<<'\n';
-      fs<<"11100001101000000000000000000000"<<'\n';
-      text_memory+=0xC;*/
-    }
-  }else if(op.compare("str")==0 || op.compare("Str")==0 || op.compare("STR")==0){
-    if(rs2.find("-")==std::string::npos){
-      binIns+="101000";
-      binIns+=regtobin(rs);
-      binIns+=regtobin(rd);
-      binIns+=immtobin(rs2,2,"");
-      fs<<binIns<<'\n';
-    }else{
-      rs2.erase(1,1);
-      binIns+="100000";
-      binIns+=regtobin(rs);
-      binIns+=regtobin(rd);
-      binIns+=immtobin(rs2,2,"");
-      fs<<binIns<<'\n';
+  if(op.compare("brt")==0 || op.compare("BRT")==0 || op.compare("Brt")==0){
+    repeat_flag = true;
+  }
+  else if(op.compare("ert")==0 || op.compare("ERT")==0 || op.compare("Ert")==0){
+    repeat_flag = false;
+    std::string str1= imme.substr(1);
+    int imm = std::stoi(str1);
+    for(int i = 0 ; i < imm ; i++){
+      std::list <std::string> templist = instlist; 
+      int size = templist.size();
+      for(int j = 0 ; j < size; j++){
+        text_memory+=0x4;
+        std::string temp1 = templist.front();
+        templist.pop_front();
+        fs<<temp1<<'\n';
+      }
     }
   }
   else{
-    std::cout<< "Error at read instruccion: not supported instruction"<<'\n';
-  }
-}
-
-//intruccion  op rd,rs,#imme
-void encondig_instruccion1(std::string op,std::string rs,std::string rd,std::string immen){
-  std::string binIns="1110";
-  text_memory+=0x4;
-  if(op.compare("Add")==0 || op.compare("ADD")==0 || op.compare("add")==0){
-    binIns+="00101000";
-    std::string r=regtobin(rs);
-    binIns+=r;
-    binIns+=regtobin(rd);
-    binIns+=immtobin(immen,1,r);
-    fs<<binIns<<'\n';
-  }
-  else if(op.compare("Sub")==0 || op.compare("sub")==0 || op.compare("SUB")==0){
-    binIns+="00100100";
-    std::string r=regtobin(rs);
-    binIns+=r;
-    binIns+=regtobin(rd);
-    binIns+=immtobin(immen,1,r);
-    fs<<binIns<<'\n';
-  }
-  else{
-    std::cout<< "Error at read instruccion: format mnemonic R,R,Imm only support cmp,mov,up"<<'\n';
+    std::cout<< "Error at read instruccion: format mnemonic Imm only support repeat operation"<<'\n';
   }
 }
 
@@ -2039,50 +2042,6 @@ std::string regtobin(std::string r){
   r.erase(0,1); //erase 'r'
   std::string bin=std::bitset<4>(atoi(r.c_str())).to_string(); //set 4 bits for number of 'r'
   return bin;
-}
-
-void variablestobin(int val){
-  if(current_type.compare("DCB")==0){ 
-    std::string bin=std::bitset<8>(val).to_string(); // assign 8 bits to val
-    if(memCount>2){
-      memCount=0; // set mem reference iterator to 0
-      fs2<<bin<<'\n'; // write to data file
-    }else{
-      memCount++; // increment count  
-      fs2<<bin; // write to data file
-    }
-  }else if(current_type.compare("DCW")==0){
-    std::string bin=std::bitset<16>(val).to_string(); // assign 16 bits to val
-    if(memCount>1){
-      memCount=0;
-      fs2<<bin<<'\n';
-    }else{
-      memCount++;
-      fs2<<bin;
-    }
-  }else if(current_type.compare("DCD")==0){
-    std::string bin=std::bitset<32>(val).to_string(); // assign 32 bits to val 
-    fs2<<bin<<'\n';
-  }
-}
-
-void procces_label(std::string tag,std::string g,int type){
-  int tmp=futureLabels.find(tag)->second; // is there any label that havent been declared
-  if(tmp > 0){ 
-    int tposition=fs.tellp();
-    int result=0x8+(0x4*tmp/33); // form of calc label dir.
-    result=(text_memory-result)/4;
-    fs.seekp(tmp+8);
-    fs<<std::bitset<24>(result).to_string();
-    fs.seekp(tposition);
-  }
-
-  if(type==1){ //get val
-    labels[tag]=text_memory; //label val
-  }else if(type==2){ // set val
-    current_type=g; // set data type for correct alignment
-    labels[tag]=data_memory;
-  }
 }
 
 //Se guarda el inmediato en binario
@@ -2095,62 +2054,12 @@ std::string immtobin(std::string in,int type,std::string rs){
   }else{
     x=strtol(in.c_str(),NULL,16);
   }
-
   if(type==1){
     if(x<4096){
-      std::string bin=std::bitset<12>(x).to_string();
+      std::string bin=std::bitset<8>(x).to_string();
       return bin;
-    }else{
-      while(x>4096){
-        x=x-4095;
-        std::string ins="111000101000";
-        ins+=rs;
-        ins+=rs;
-        ins+="111111111111";
-        fs<<ins<<'\n';
-        text_memory+=0x4;
-      }
-      std::string bin=std::bitset<12>(x).to_string();
-      return bin;
-    }
-  }else if(type==2){
-    std::string bin=std::bitset<12>(x).to_string();
-    return bin;
-  }else if(type==3){
-    std::string bin=std::bitset<24>(x).to_string();
-    return bin;
-  }else if(type==4){
-    if(x<4096){
-      std::string bin=std::bitset<12>(x).to_string();
-      return bin;
-    }else{
-      x=x-4095;
-      std::string ins="1110001110100000";
-      ins+=rs;
-      ins+="111111111111";
-      fs<<ins<<'\n';
-      while(x>4096){
-        x=x-4095;
-        ins="111000101000";
-        ins+=rs;
-        ins+=rs;
-        ins+="111111111111";
-        fs<<ins<<'\n';
-        text_memory+=0x4;
-      }
-      ins="111000101000";
-      ins+=rs;
-      ins+=rs;
-      ins+=std::bitset<12>(x).to_string();
-      fs<<ins<<'\n';
-      std::string bin="nop";
-      return "nop";
     }
   }
-}
-
-void printt(std::string s){
-  std::cout << s << std::endl;
 }
 
 void yyerror(std::string S){
@@ -2160,49 +2069,10 @@ void yyerror(std::string S){
   exit(0);
 }
 
-int bin2decimal(int data) {
-  int output = 0;
-  int m = 1;
-  for (int i = 0; data > 0; i++) {
-    if (data % 10 == 1) {
-      output += m;
-    }
-    data /= 10;
-    m <<= 1;
-  }
-  return output;
-}
-
-std::string binary2hex(int data) {
-  int binnum = bin2decimal(data);
-  long int rem, quot;
-  int i = 1, j, temp;
-  char hexdecnum[100];
-  std::string result = "";
-  quot = binnum;
-  while (quot != 0) {
-    temp = quot % 16;
-    if (temp < 10) {
-      temp = temp + 48;
-    } else {
-      temp = temp + 55;
-    }
-    hexdecnum[i++] = temp;
-    quot = quot / 16;
-  }
-  for (j = i - 1; j > 0; j--) {
-    std::cout << hexdecnum[j];
-    result = result + hexdecnum[j];
-  }
-  return result;
-
-}
-
 int main(void) {
 
   std::cout<<"Ruta del archivo a compilar"<<'\n';
   fs.open ("text_out.txt", std::ios::out | std::ios::trunc); //Intrucciones
-  fs2.open ("data_out.txt", std::ios::out | std::ios::trunc); //Datos
   std::cin>>ruta;
   FILE *myfile = fopen(ruta.c_str(), "r");
 
@@ -2219,7 +2089,6 @@ int main(void) {
   
 
   fs.close();
-  fs2.close();
   std::cout<<final_message<<'\n';
   for(int i=0;i<100;++i);
 }

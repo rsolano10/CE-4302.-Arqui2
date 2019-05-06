@@ -7,16 +7,18 @@ class memReg
 {
 
   public:
-    int *ALUControlM; /* ALUControl --> 1 = add, 2 = sub, 3 = mult, 4 = xor*/
     int *RegWriteM;
     int *MemWriteM;
-    int *ALUResultM;    
+    string *ALUResultM;    
+    int *memToRegM;
+    int *RdM;
 
-    memReg(int *ALUControlE, int *RegWriteE, int *MemWriteE, int *ALUResultE)
+    memReg(int *RegWriteE, int *MemWriteE, string *ALUResultE, int *memtToRegE, int *RdE)
     {
-        ALUControlM = ALUControlE;
         RegWriteM = RegWriteE;
         MemWriteM = MemWriteE;
         ALUResultM = ALUResultE;
+        memToRegM = memtToRegE;
+        RdM = RdE;
     }
 };

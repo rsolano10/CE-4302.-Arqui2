@@ -1,24 +1,26 @@
 #include <iostream>
+#include <string>
+#include <bitset>
 
 using namespace std;
 
 class Register
 {
   private:
-    int Reg;
+    string Reg;
 
   public:
     Register()
     {
-        Reg = 0;
+        Reg = bitset<64>(0).to_string();
     }
 
-    void setReg(int data)
+    void setReg(string data)
     {
         Reg = data;
     }
 
-    int getReg()
+    string getReg()
     {
         return Reg;
     }

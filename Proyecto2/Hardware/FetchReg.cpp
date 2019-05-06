@@ -29,17 +29,27 @@ class fetchReg
     }
 
     string getRa1(){
-        Ra1 = std::stoi((*inst).substr(20,4), nullptr, 2);
-        return (*inst).substr(20,4);
+        if(Op == "0000"){ //xor
+            Ra1 = std::stoi((*inst).substr(20,4), nullptr, 2);
+            return (*inst).substr(20,4);
+        }
+        else if(Op == "0101"){ //mov imm
+            Ra1 = std::stoi((*inst).substr(20,4), nullptr, 2);
+            return (*inst).substr(20,4);
+        }
     }
 
     string getRa2(){
-        Ra2 = std::stoi((*inst).substr(24,4), nullptr, 2);
-        return (*inst).substr(24,4);
+        if(Op == "0000"){
+            Ra2 = std::stoi((*inst).substr(24,4), nullptr, 2);
+            return (*inst).substr(24,4);
+        }
     }
 
     string getRd(){
-        Rd = std::stoi((*inst).substr(28,4), nullptr, 2);
-        return (*inst).substr(28,4);
+        if(Op == "0000"){
+            Rd = std::stoi((*inst).substr(28,4), nullptr, 2);
+            return (*inst).substr(28,4);
+        }
     }
 };
