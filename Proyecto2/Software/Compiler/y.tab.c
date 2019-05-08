@@ -1754,7 +1754,7 @@ void encondig_instruccion1(std::string op,std::string rs,std::string rd,std::str
   }
   else if(op.compare("Sub")==0 || op.compare("sub")==0 || op.compare("SUB")==0){
     binIns+="0010"; // Op code for add
-    binIns+="100000000000"; // bit of reg or imm operation + empty bits if necessary
+    binIns+="10000000"; // bit of reg or imm operation + empty bits if necessary
     std::string r=regtobin(rd);
     binIns+=r;
     binIns+=regtobin(rs);
@@ -1767,7 +1767,7 @@ void encondig_instruccion1(std::string op,std::string rs,std::string rd,std::str
     }
   }else if(op.compare("Mul")==0 || op.compare("MUL")==0 || op.compare("mul")==0){
     binIns+="0011"; // Op code for mul
-    binIns+="100000000000"; // bit of reg or imm operation + empty bits if necessary
+    binIns+="10000000"; // bit of reg or imm operation + empty bits if necessary
     std::string r=regtobin(rd);
     binIns+=r;
     binIns+=regtobin(rs);
@@ -1781,7 +1781,7 @@ void encondig_instruccion1(std::string op,std::string rs,std::string rd,std::str
   }
   else if(op.compare("Xor")==0 || op.compare("XOR")==0 || op.compare("xor")==0){
     binIns+="0000"; // Op code for xor
-    binIns+="100000000000"; // bit of reg or imm operation + empty bits if necessary
+    binIns+="10000000"; // bit of reg or imm operation + empty bits if necessary
     std::string r=regtobin(rd);
     binIns+=r;
     binIns+=regtobin(rs);

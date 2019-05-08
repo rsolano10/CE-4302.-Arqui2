@@ -28,6 +28,9 @@ class ALU
     {
         Result = ((*op1) ^ (*op2));
     }
+    int pass(){
+        Result = *op1;
+    }
 
   public:
     int Result;
@@ -41,6 +44,18 @@ class ALU
     void operate(){
         if(*flag == 4){
             xori(); 
+        }
+        else if(*flag == 1){
+            sum();
+        }
+        else if(*flag == 2){
+            sub();
+        }
+        else if(*flag == 3){
+            mult();
+        }
+        else if(*flag == 0){
+            pass();
         }
     }
 };

@@ -21,5 +21,14 @@ class execControlUnit
         if(*flag == 4){
             regWrite2 = 1;  
         } /*continue with else ifs*/
+        if(*flag == 1){
+            regWrite2 = 1;  
+        } /*continue with else ifs*/
+        if(*flag == 2){
+            regWrite2 = 1;  
+        } /*continue with else ifs*/
+        if(*flag == 3){
+            regWrite2 = 1;  
+        } /*continue with else ifs*/
     }
 };

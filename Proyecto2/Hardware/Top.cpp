@@ -95,6 +95,8 @@ void fetch()
         printstring("Ra1 fetch register value", freg->getRa1()); // actualiza Op en el registro del fetch
         printstring("Ra2 fetch register value", freg->getRa2()); // actualiza Op en el registro del fetch
         printstring("Rd fetch register value", freg->getRd());   // actualiza Op en el registro del fetch
+        printstring("Imm fetch register value", freg->getImm());   // actualiza Op en el registro del fetch
+        printstring("isImm fetch register value", freg->getisImm());   // actualiza Op en el registro del fetch
     }
     catch (exception e)
     {
@@ -124,6 +126,7 @@ void decode()
     printint("exec reg RegWriteE", (*ereg->RegWriteE));
     printint("exec reg MemWriteE", (*ereg->MemWriteE));
     printint("exec reg memToReg", (*ereg->memtoRegE));
+    printint("exec reg Rd",(*ereg->RdE));
     system_mutex.unlock();
 }
 
@@ -151,6 +154,13 @@ void exec()
     printint("balancer Rd2E1",balancer->Rd2E1);
 
     alu->operate();
+    alu1->operate();
+    alu2->operate();
+    alu3->operate();
+    alu4->operate();
+    alu5->operate();
+    alu6->operate();
+    alu7->operate();
     printint("ALU result", alu->Result);
     printint("ALU1 result", alu1->Result);
     printint("ALU2 result", alu2->Result);
@@ -170,6 +180,7 @@ void exec()
     printstring("mem reg ALUResultM", (*mreg->ALUResultM));
     printint("mem reg RegWriteM", (*mreg->RegWriteM));
     printint("mem reg MemWriteEM", (*mreg->MemWriteM));
+    printint("mem reg Rd",(*mreg->RdM));
     printint("exec reg memToReg", (*mreg->memToRegM));
     system_mutex.unlock();
 }
@@ -217,10 +228,10 @@ int main()
     imem = new instMemory();
     freg = new fetchReg(&(imem->instruction));
     regmem = new registersMem(&(freg->Ra1), &(freg->Ra2), &(*_regFlag));
-    cunit = new controlUnit(&(freg->Op), &(freg->Rd));
-    ereg = new execReg(&(cunit->ALUControlD), &(cunit->RegWriteD), &(cunit->MemWriteD), &(regmem->Rd1), &(regmem->Rd2), &(cunit->memtoReg), &(*cunit->Rd));
+    cunit = new controlUnit(&(freg->Op), &(freg->Rd),&(freg->isRegOp));
+    ereg = new execReg(&(cunit->ALUControlD), &(cunit->RegWriteD), &(cunit->MemWriteD), &(regmem->Rd1), &(regmem->Rd2), &(cunit->memtoReg), &(*cunit->Rd), &(freg->Imm),&(*cunit->isImm));
     ecu = new execControlUnit(&(*ereg->ALUControlE));
-    balancer = new loadBalancer(&(*ereg->Rd1E), &(*ereg->Rd2E));
+    balancer = new loadBalancer(&(*ereg->Rd1E), &(*ereg->Rd2E),&(*ereg->isImmE),&(*ereg->ImmE));
     alu = new ALU(&(balancer->Rd1E8), &(balancer->Rd2E8), &(*ereg->ALUControlE));
     alu1 = new ALU(&(balancer->Rd1E7), &(balancer->Rd2E7), &(*ereg->ALUControlE));
     alu2 = new ALU(&(balancer->Rd1E6), &(balancer->Rd2E6), &(*ereg->ALUControlE));
