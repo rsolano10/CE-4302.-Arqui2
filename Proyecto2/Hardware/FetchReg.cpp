@@ -5,16 +5,17 @@ using namespace std;
 
 class fetchReg
 {
-  private:
+private:
     string *inst;
 
-  public:
+public:
     int Ra1;
     int Ra2;
     int Rd;
     string Imm;
     string Op;
     string isRegOp;
+    int LdSt;
 
     fetchReg(string *instruction)
     {
@@ -38,19 +39,32 @@ class fetchReg
         if (isRegOp == "0")
         {
             if (Op == "0000" || Op == "0001" || Op == "0010" || Op == "0011")
-            { //xor
+            {
                 Ra1 = std::stoi((*inst).substr(20, 4), nullptr, 2);
                 return (*inst).substr(20, 4);
+            }
+            else if (Op == "1010")
+            {
+                LdSt = 0;
+                Ra1 = std::stoi((*inst).substr(24, 4), nullptr, 2);
+                return (*inst).substr(24, 4);
+            }
+            else if (Op == "1011")
+            {
+                LdSt = 1;
+                Ra1 = std::stoi((*inst).substr(28, 4), nullptr, 2);
+                return (*inst).substr(28, 4);
             }
         }
         else
         {
             if (Op == "0000" || Op == "0001" || Op == "0010" || Op == "0011")
-            { //xor
+            {
                 Ra1 = std::stoi((*inst).substr(20, 4), nullptr, 2);
                 return (*inst).substr(20, 4);
             }
-            else if(Op == "0101"){
+            else if (Op == "0101")
+            {
                 Ra1 = 0;
                 return "0000";
             }
@@ -67,6 +81,17 @@ class fetchReg
                 Ra2 = std::stoi((*inst).substr(24, 4), nullptr, 2);
                 return (*inst).substr(24, 4);
             }
+            else if (Op == "1010")
+            {
+                Ra2 = 0;
+                return "0000";
+            }
+            else if (Op == "1011")
+            {
+                Ra2 = std::stoi((*inst).substr(24, 4), nullptr, 2);
+                return (*inst).substr(24, 4);
+            }
+            
         }
         else
         {
@@ -75,7 +100,8 @@ class fetchReg
                 Ra2 = 0;
                 return "0000";
             }
-            else if(Op == "0101"){
+            else if (Op == "0101")
+            {
                 Ra2 = 0;
                 return "0000";
             }
@@ -92,6 +118,16 @@ class fetchReg
                 Rd = std::stoi((*inst).substr(28, 4), nullptr, 2);
                 return (*inst).substr(28, 4);
             }
+            else if (Op == "1010")
+            {
+                Rd = std::stoi((*inst).substr(28, 4), nullptr, 2);
+                return (*inst).substr(28, 4);
+            }
+            else if (Op == "1011")
+            {
+                Rd = 0;
+                return "0000";
+            }
         }
         else
         {
@@ -100,7 +136,8 @@ class fetchReg
                 Rd = std::stoi((*inst).substr(16, 4), nullptr, 2);
                 return (*inst).substr(16, 4);
             }
-            else if(Op == "0101"){
+            else if (Op == "0101")
+            {
                 Rd = std::stoi((*inst).substr(20, 4), nullptr, 2);
                 return (*inst).substr(20, 4);
             }
@@ -108,11 +145,12 @@ class fetchReg
     }
     string getImm()
     {
-            Imm =  (*inst).substr(24, 8);
-            return (*inst).substr(24, 8);
+        Imm = (*inst).substr(24, 8);
+        return (*inst).substr(24, 8);
     }
 
-    string getisImm(){
+    string getisImm()
+    {
         return (*inst).substr(8, 1);
     }
 };

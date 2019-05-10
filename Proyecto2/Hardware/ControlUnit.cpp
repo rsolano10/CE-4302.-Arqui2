@@ -54,5 +54,17 @@ class controlUnit
             MemWriteD = 0;
             memtoReg = 0;
         }
+        else if(*Op == "1010"){
+            ALUControlD = 0;
+            RegWriteD = 0;
+            MemWriteD = 0;
+            memtoReg = 1;
+        }
+        else if(*Op == "1011"){
+            ALUControlD = 0;
+            RegWriteD = 0;
+            MemWriteD = 1;
+            memtoReg = 0;
+        }
     }
 };

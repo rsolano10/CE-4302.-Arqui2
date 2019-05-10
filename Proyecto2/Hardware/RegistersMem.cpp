@@ -28,9 +28,9 @@ public:
   registersMem(int *Ra1, int *Ra2, int *regWrite2)
   {
     R1 = new Register();
-    //R1->setReg("0000000000000000000000000000000000000000000000000000000000000001");
+    R1->setReg("0000000000000000000000000000000000000000000000000000000000000001");
     R2 = new Register();
-    //R2->setReg("0000000000000000000000000000000000000001000000010000000100000010");
+    R2->setReg("0000000000000000000000000000000000000000000000000000000000000010");
     R3 = new Register();
     R4 = new Register();
     R5 = new Register();
@@ -47,6 +47,7 @@ public:
   void getRd1()
   {
     string temp;
+    cout << "RA1: " << *Ra1d << endl;
     switch (*Ra1d)
     {
     case 1:

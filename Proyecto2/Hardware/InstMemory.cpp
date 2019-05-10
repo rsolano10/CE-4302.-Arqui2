@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#define INSTMEMSIZE 1000
+#define INSTMEMSIZE 350000
 
 using namespace std;
 class instMemory

@@ -352,7 +352,7 @@ void encondig_instruccion4(std::string op,std::string rd,std::string rs,std::str
   if(op.compare("ldr")==0 || op.compare("Ldr")==0 || op.compare("LDR")==0){
     if(type==1){ //op rd,[r]
       binIns+="1010";
-      binIns+="0000000000000000"; // empty bits if necessary
+      binIns+="0100000000000000"; // empty bits if necessary
       binIns+=regtobin(rs);
       binIns+=regtobin(rd);
       if(!repeat_flag){
@@ -364,7 +364,7 @@ void encondig_instruccion4(std::string op,std::string rd,std::string rs,std::str
     }else if(type==3){ //op rd,[r,imm]
       if(rs2.find("-")==std::string::npos){ //neg imm
         binIns+="1010";
-        binIns+="10000000"; // empty bits if necessary
+        binIns+="11000000"; // empty bits if necessary
         binIns+=regtobin(rs);
         binIns+=regtobin(rd);
         binIns+=immtobin(rs2,1,"");
@@ -377,7 +377,7 @@ void encondig_instruccion4(std::string op,std::string rd,std::string rs,std::str
       }else{ //pos imm
         rs2.erase(1,1);
         binIns+="1010";
-        binIns+="10000000"; // empty bits if necessary
+        binIns+="11000000"; // empty bits if necessary
         binIns+=regtobin(rs);
         binIns+=regtobin(rd);
         binIns+=immtobin(rs2,1,"");
@@ -392,7 +392,7 @@ void encondig_instruccion4(std::string op,std::string rd,std::string rs,std::str
   }else if(op.compare("str")==0 || op.compare("Str")==0 || op.compare("STR")==0){
     if(type==1){ //op rd,[r]
       binIns+="1011";
-      binIns+="0000000000000000"; // empty bits if necessary
+      binIns+="0100000000000000"; // empty bits if necessary
       binIns+=regtobin(rs);
       binIns+=regtobin(rd);
       if(!repeat_flag){
@@ -404,7 +404,7 @@ void encondig_instruccion4(std::string op,std::string rd,std::string rs,std::str
     }else if(type==3){ //op rd,[r,imm]
       if(rs2.find("-")==std::string::npos){
         binIns+="1011";
-        binIns+="10000000"; // empty bits if necessary
+        binIns+="11000000"; // empty bits if necessary
         binIns+=regtobin(rs);
         binIns+=regtobin(rd);
         binIns+=immtobin(rs2,1,"");
@@ -417,7 +417,7 @@ void encondig_instruccion4(std::string op,std::string rd,std::string rs,std::str
       }else{
         rs2.erase(1,1);
         binIns+="1011";
-        binIns+="10000000"; // empty bits if necessary
+        binIns+="11000000"; // empty bits if necessary
         binIns+=regtobin(rs);
         binIns+=regtobin(rd);
         binIns+=immtobin(rs2,1,"");

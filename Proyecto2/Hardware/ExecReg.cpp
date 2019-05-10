@@ -16,8 +16,9 @@ public:
   int *RdE;
   string *ImmE;
   string *isImmE;
+  int *LDSTE;
 
-  execReg(int *ALUControlD, int *RegWriteD, int *MemWriteD, string *Rd1, string *Rd2, int *memtoReg, int *RdD, string *Imm, string *isImmOp)
+  execReg(int *ALUControlD, int *RegWriteD, int *MemWriteD, string *Rd1, string *Rd2, int *memtoReg, int *RdD, string *Imm, string *isImmOp, int *LDST)
   {
     ALUControlE = ALUControlD;
     RegWriteE = RegWriteD;
@@ -28,5 +29,6 @@ public:
     RdE = RdD;
     ImmE = Imm;
     isImmE = isImmOp;
+    LDSTE = LDST;
   }
 };

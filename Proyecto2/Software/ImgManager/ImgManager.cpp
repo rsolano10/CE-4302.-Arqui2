@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
+#include <fstream>
 
 #define TRUE 1
 #define FALSE 0
@@ -120,7 +121,7 @@ void readImage(char* input, unsigned char **image)
 }
 
 // Write a image
-void writeImage(char *output, unsigned char **image)
+void writeImage(char* output, unsigned char **image)
 {
     FILE *fpOut;
     fpOut = fopen(output, "wb");
@@ -162,4 +163,23 @@ void printMatrix(unsigned char **image)
         }
         printf("\n");
     }
+}
+
+// Write a image
+void writeMatrix(char* output, unsigned char **image)
+{
+    std::ofstream out(output);
+
+    int cont = 0;
+    for (int i = 0; i < numberOfRows; i++)
+    {
+        for (int j = 0; j < numberOfColumns; j++)
+        {
+            out << to_string((*image)[cont]) + ",";
+            //myfile << atoi((*image)[cont]) + ",";
+            cont++;
+        }
+        out << "\n";
+    }
+    out.close();
 }

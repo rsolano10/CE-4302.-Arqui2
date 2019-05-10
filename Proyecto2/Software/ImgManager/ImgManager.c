@@ -11,7 +11,7 @@ int numberOfBands, numberOfColumns, numberOfRows, highVal, totalPixels;
 
 // Functions
 void readImage(char **argv, unsigned char **image);
-void writeImage(char **argv, unsigned char **image);
+void writeImage(unsigned char **image);
 void printImage(unsigned char **image);
 void StoreImage(unsigned char **image);
 
@@ -121,10 +121,10 @@ void readImage(char **argv, unsigned char **image)
 }
 
 // Write a image
-void writeImage(char **argv, unsigned char **image)
+void writeImage(unsigned char **image)
 {
     FILE *fpOut;
-    fpOut = fopen(argv[OUTPUT], "wb");
+    fpOut = fopen("output.pgm", "wb");
 
     //verify if file could be oppened
     if (fpOut == NULL)

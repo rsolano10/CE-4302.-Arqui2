@@ -30,6 +30,8 @@ class writeReg
 
     void updateFlags(){
       regWrite2 = RegWriteW;
+      cout << "dataout: " << *dataout << endl;
+      cout << "ALUData: " << *ALUdata << endl;
       if(*memtoRegW == 1){
         writedata = *dataout;
       }

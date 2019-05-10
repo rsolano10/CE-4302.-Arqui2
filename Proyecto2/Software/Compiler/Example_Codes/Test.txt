@@ -1,3 +1,8 @@
-MOV R1,#1
-MOV R2,#1
-ADD R1,R2,R3
+MOV R1,#0 ; Registro de control
+MOV R2,#134 ; mascara
+brt #10000
+LDR R3,[R1] ; Carga de Datos
+XOR R3,R2,R4 ; aplicaion de xor
+STR R4,[R1] ; guardado de datos
+ADD R1,R1,#8 ; incrementa registro de referencia
+ert #10000
