@@ -1793,6 +1793,35 @@ void encondig_instruccion1(std::string op,std::string rs,std::string rd,std::str
       instlist.push_back(binIns);
     }
   }
+  else if(op.compare("csl")==0 || op.compare("CSL")==0 || op.compare("Csl")==0){
+    binIns+="0110";
+    binIns+="10000000"; // bit of reg or imm operation + empty bits if necessary
+    std::string r=regtobin(rd);
+    binIns+=r;
+    binIns+=regtobin(rs);
+    binIns+=immtobin(immen,1,r);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
+  }
+  else if(op.compare("csr")==0 || op.compare("CSR")==0 || op.compare("Csr")==0){
+    binIns+="0111";
+    binIns+="10000000"; // bit of reg or imm operation + empty bits if necessary
+    std::string r=regtobin(rd);
+    binIns+=r;
+    binIns+=regtobin(rs);
+    binIns+=immtobin(immen,1,r);
+    if(!repeat_flag){
+      fs<<binIns<<'\n';
+    }
+    else{
+      instlist.push_back(binIns);
+    }
+    
+  }
   else{
     std::cout<< "Error at read instruccion: format mnemonic R,R,Imm only support cmp,mov,up"<<'\n';
   }
@@ -1859,33 +1888,6 @@ void encondig_instruccion3(std::string op,std::string rs,std::string imme){
     else{
       instlist.push_back(binIns);
     }
-  }
-  else if(op.compare("csl")==0 || op.compare("CSL")==0 || op.compare("Csl")==0){
-    binIns+="0110";
-    binIns+="100000000000"; // empty bits if necessary
-    std::string r=regtobin(rs);
-    binIns+=r;
-    binIns+=immtobin(imme,1,r);
-    if(!repeat_flag){
-      fs<<binIns<<'\n';
-    }
-    else{
-      instlist.push_back(binIns);
-    }
-  }
-  else if(op.compare("csr")==0 || op.compare("CSR")==0 || op.compare("Csr")==0){
-    binIns+="0111";
-    binIns+="100000000000"; // empty bits if necessary
-    std::string r=regtobin(rs);
-    binIns+=r;
-    binIns+=immtobin(imme,1,r);
-    if(!repeat_flag){
-      fs<<binIns<<'\n';
-    }
-    else{
-      instlist.push_back(binIns);
-    }
-    
   }
   else if(op.compare("lsl")==0 || op.compare("LSL")==0 || op.compare("Lsl")==0){
     binIns+="1000";

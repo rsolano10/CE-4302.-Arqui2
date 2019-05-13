@@ -1,5 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdint.h>   // for uint32_t
+#include <limits.h>   // for CHAR_BIT
+// #define NDEBUG
+#include <assert.h>
 
 #define TRUE 1
 #define FALSE 0
@@ -11,7 +15,7 @@ int numberOfBands, numberOfColumns, numberOfRows, highVal, totalPixels;
 
 // Functions
 void readImage(char **argv, unsigned char **image);
-void writeImage(unsigned char **image);
+void writeImage(char *output,unsigned char **image);
 void printImage(unsigned char **image);
 void StoreImage(unsigned char **image);
 
@@ -121,10 +125,10 @@ void readImage(char **argv, unsigned char **image)
 }
 
 // Write a image
-void writeImage(unsigned char **image)
+void writeImage(char *output, unsigned char **image)
 {
     FILE *fpOut;
-    fpOut = fopen("output.pgm", "wb");
+    fpOut = fopen(output, "wb");
 
     //verify if file could be oppened
     if (fpOut == NULL)
@@ -136,7 +140,7 @@ void writeImage(unsigned char **image)
     // Write File
     fprintf(fpOut, "P%d\n%d %d\n%d\n", 5, numberOfColumns, numberOfRows, highVal);
     fwrite((*image), 1, totalPixels, fpOut);
-    free((*image));
+    //free((*image));
     printf("Image Wrote\n");
 }
 
@@ -165,13 +169,98 @@ void printMatrix(unsigned char **image)
     }
 }
 
-/*void StoreImage(unsigned char **image)
+// Write a image
+void writeMatrix(char *output, unsigned char **image)
 {
-    for (int i = 0; i < totalPixels; i++)
+
+    FILE *f = fopen(output, "wb");
+    if (f == NULL)
     {
-        writeDataMem((int)(*image)[i]);
+        printf("Error opening file!\n");
+        exit(1);
     }
-}*/
+
+    int cont = 0;
+    for (int i = 0; i < numberOfRows; i++)
+    {
+        for (int j = 0; j < numberOfColumns; j++)
+        {
+            int temp = (*image)[cont];
+            if(temp < 10){
+                fprintf(f, "|%d  |", temp);
+            }
+            else if(temp < 100){
+                fprintf(f, "|%d |", temp);
+            }
+            if(temp < 1000){
+                fprintf(f, "|%d|", temp);
+            }
+            
+            cont++;
+        }
+        fprintf(f,"\n");
+    }
+    fclose(f);
+}
+
+void xorimg(unsigned char **image){
+
+    for (int j = 0; j < totalPixels; j++)
+        {
+            (*image)[j] = (int) ((*image)[j] ^ 134);
+        }
+}
+
+void sumimg(unsigned char **image){
+
+    for (int j = 0; j < totalPixels; j++)
+        {
+            (*image)[j] = (int) ((*image)[j] + 100);
+        }
+}
+
+void restimg(unsigned char **image){
+
+    for (int j = 0; j < totalPixels; j++)
+        {
+            (*image)[j] = (int) ((*image)[j] - 100);
+        }
+}
+
+static inline uint32_t rotl32 (uint32_t n, unsigned int c)
+{
+  const unsigned int mask = (CHAR_BIT*sizeof(n) - 1);  // assumes width is a power of 2.
+
+  // assert ( (c<=mask) &&"rotate by type width or more");
+  c &= mask;
+  return (n<<c) | (n>>( (-c)&mask ));
+}
+
+static inline uint32_t rotr32 (uint32_t n, unsigned int c)
+{
+  const unsigned int mask = (CHAR_BIT*sizeof(n) - 1);
+
+  // assert ( (c<=mask) &&"rotate by type width or more");
+  c &= mask;
+  return (n>>c) | (n<<( (-c)&mask ));
+}
+
+void shiftleft(unsigned char **image){
+
+    for (int j = 0; j < totalPixels; j++)
+        {
+            
+            (*image)[j] = ( (*image)[j] << 1 ) + ( (*image)[j] >> 7 );
+        }
+}
+
+void shiftright(unsigned char **image){
+
+    for (int j = 0; j < totalPixels; j++)
+        {
+            (*image)[j] = ( (*image)[j] >> 1 ) + ( (*image)[j] << 7 );
+        }
+}
 
 //Funcion principal
 int main(int argc, char **argv)
@@ -183,15 +272,55 @@ int main(int argc, char **argv)
 
     readImage(argv, &image2);
 
-    //initDataMem();
+    writeImage("original.pgm",&image2);
 
-    //StoreImage(&image2);
+    writeMatrix("original.txt",&image2);
 
-    //printf("%i\n",readDataMem(639999));
+    xorimg(&image2);
 
-    //printMatrix(&image2);
+    writeImage("xor.pgm",&image2);
 
-    //printf("rows: %i, columns: %i\n",numberOfRows,numberOfColumns);
+    writeMatrix("xor.txt",&image2);
 
-    return 0;
+    xorimg(&image2);
+
+    writeImage("xor_return.pgm",&image2);
+
+    writeMatrix("xor_return.txt",&image2);
+
+    sumimg(&image2);
+
+    writeImage("sum.pgm",&image2);
+
+    writeMatrix("sum_return.txt",&image2);
+
+    restimg(&image2);
+
+    writeImage("rest.pgm",&image2);
+
+    writeMatrix("rest_return.txt",&image2);
+
+    shiftleft(&image2);
+
+    writeImage("left.pgm",&image2);
+
+    writeMatrix("left_return.txt",&image2);
+
+    shiftright(&image2);
+
+    writeImage("right.pgm",&image2);
+
+    writeMatrix("right_return.txt",&image2);
+
+        //initDataMem();
+
+        //StoreImage(&image2);
+
+        //printf("%i\n",readDataMem(639999));
+
+        //printMatrix(&image2);
+
+        //printf("rows: %i, columns: %i\n",numberOfRows,numberOfColumns);
+
+        return 0;
 }

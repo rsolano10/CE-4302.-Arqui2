@@ -136,7 +136,7 @@ void writeImage(char* output, unsigned char **image)
     // Write File
     fprintf(fpOut, "P%d\n%d %d\n%d\n", 5, numberOfColumns, numberOfRows, highVal);
     fwrite((*image), 1, totalPixels, fpOut);
-    free((*image));
+    //free((*image));
     printf("Image Wrote\n");
 }
 

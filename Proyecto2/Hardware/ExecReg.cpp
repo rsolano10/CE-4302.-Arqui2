@@ -17,8 +17,9 @@ public:
   string *ImmE;
   string *isImmE;
   int *LDSTE;
+  int *ScalarE;
 
-  execReg(int *ALUControlD, int *RegWriteD, int *MemWriteD, string *Rd1, string *Rd2, int *memtoReg, int *RdD, string *Imm, string *isImmOp, int *LDST)
+  execReg(int *ALUControlD, int *RegWriteD, int *MemWriteD, string *Rd1, string *Rd2, int *memtoReg, int *RdD, string *Imm, string *isImmOp, int *LDST,int *Scalar)
   {
     ALUControlE = ALUControlD;
     RegWriteE = RegWriteD;
@@ -30,5 +31,6 @@ public:
     ImmE = Imm;
     isImmE = isImmOp;
     LDSTE = LDST;
+    ScalarE = Scalar;
   }
 };

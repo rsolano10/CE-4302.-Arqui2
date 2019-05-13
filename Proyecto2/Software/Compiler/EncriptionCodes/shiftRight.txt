@@ -1,0 +1,8 @@
+MOV R1,#0 ; Registro de control
+MOV R2,#134 ; mascara
+brt #10000 ; definido segun el tamaño de la image 
+LDR R3,[R1] ; Carga de Datos
+CSR R4,R3,#1 ; aplicaion de shift
+STR R4,[R1] ; guardado de datos
+ADD R1,R1,#8 ; incrementa registro de referencia
+ert #10000

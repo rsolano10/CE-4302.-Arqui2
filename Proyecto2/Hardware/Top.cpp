@@ -28,6 +28,7 @@
 #define IMGPATHO "/home/rodolfo/git/CE-4302.-Arqui2/Proyecto2/Documentos/Imagenes/output.pgm"
 #define MEMPATHI "/home/rodolfo/git/CE-4302.-Arqui2/Proyecto2/Documentos/Imagenes/input_data.txt"
 #define MEMPATHO "/home/rodolfo/git/CE-4302.-Arqui2/Proyecto2/Documentos/Imagenes/output_data.txt"
+#define MAXINST 40002
 
 dataMemory *dmem;     // data mem
 instMemory *imem;     // instruction mem
@@ -114,6 +115,7 @@ void decode()
     printint("ALU flag control unit", cunit->ALUControlD);
     printint("Reg mem. flag control unit", cunit->RegWriteD);
     printint("Data mem. flag control unit", cunit->MemWriteD);
+    printint("Scalar flag control unit", cunit->Scalar);
     //TODO: cambiar registros para leer 8 datos en vez de 1 solo int
     //for read only
     regmem->getRd1(); //get Rd1 value
@@ -211,6 +213,7 @@ void writeBack()
     printStep("Write Back");
     printint("Register to write", *wreg->RdW);
     regmem->writeReg(*wreg->RdW, wreg->writedata);
+    cout << "mem space to read: " << *wreg->RdW <<endl;
     //printstring("Write-back reg Read", regmem->getRegMem(*wreg->RdW));
     system_mutex.unlock();
 }
@@ -232,9 +235,9 @@ int main()
     freg = new fetchReg(&(imem->instruction));
     regmem = new registersMem(&(freg->Ra1), &(freg->Ra2), &(*_regFlag));
     cunit = new controlUnit(&(freg->Op), &(freg->Rd), &(freg->isRegOp));
-    ereg = new execReg(&(cunit->ALUControlD), &(cunit->RegWriteD), &(cunit->MemWriteD), &(regmem->Rd1), &(regmem->Rd2), &(cunit->memtoReg), &(*cunit->Rd), &(freg->Imm), &(*cunit->isImm),&(freg->LdSt));
+    ereg = new execReg(&(cunit->ALUControlD), &(cunit->RegWriteD), &(cunit->MemWriteD), &(regmem->Rd1), &(regmem->Rd2), &(cunit->memtoReg), &(*cunit->Rd), &(freg->Imm), &(*cunit->isImm),&(freg->LdSt),&cunit->Scalar);
     ecu = new execControlUnit(&(*ereg->ALUControlE));
-    balancer = new loadBalancer(&(*ereg->Rd1E), &(*ereg->Rd2E), &(*ereg->isImmE), &(*ereg->ImmE),&(*ereg->LDSTE));
+    balancer = new loadBalancer(&(*ereg->Rd1E), &(*ereg->Rd2E), &(*ereg->isImmE), &(*ereg->ImmE),&(*ereg->LDSTE),&(*ereg->ScalarE));
     alu = new ALU(&(balancer->Rd1E8), &(balancer->Rd2E8), &(*ereg->ALUControlE));
     alu1 = new ALU(&(balancer->Rd1E7), &(balancer->Rd2E7), &(*ereg->ALUControlE));
     alu2 = new ALU(&(balancer->Rd1E6), &(balancer->Rd2E6), &(*ereg->ALUControlE));
@@ -243,7 +246,7 @@ int main()
     alu5 = new ALU(&(balancer->Rd1E3), &(balancer->Rd2E3), &(*ereg->ALUControlE));
     alu6 = new ALU(&(balancer->Rd1E2), &(balancer->Rd2E2), &(*ereg->ALUControlE));
     alu7 = new ALU(&(balancer->Rd1E1), &(balancer->Rd2E1), &(*ereg->ALUControlE));
-    integrator = new Integrator(&alu->Result, &alu1->Result, &alu2->Result, &alu3->Result, &alu4->Result, &alu5->Result, &alu6->Result, &alu7->Result);
+    integrator = new Integrator(&alu->Result, &alu1->Result, &alu2->Result, &alu3->Result, &alu4->Result, &alu5->Result, &alu6->Result, &alu7->Result,&(*ereg->ScalarE));
     mreg = new memReg(&(ecu->regWrite2), &(*ereg->MemWriteE), &(integrator->ALUResult), &(*ereg->memtoRegE), &(*ereg->RdE));
     dmem = new dataMemory(&(integrator->ALUResult), &(*mreg->MemWriteM),&(balancer->bdir));
     wreg = new writeReg(&(*mreg->RegWriteM), &(*mreg->MemWriteM), &(integrator->ALUResult), &(dmem->memResult), &(*_regFlag), &(*mreg->memToRegM), &(*mreg->RdM));
@@ -252,6 +255,7 @@ int main()
 
     loadInst(); // load instructions into memory
     loadData(); // load image into memory
+    writeMatrix(MEMPATHI,&image);
 
     //clock choice
     loadMenu();
@@ -299,7 +303,7 @@ int main()
             exec();
             mem();
             writeBack();
-            if(pc->getPC() == 40002){
+            if(pc->getPC() == MAXINST){
                 unsigned char *img2;
                 img2 = (unsigned char*)malloc(numberOfColumns*numberOfRows);
                 
